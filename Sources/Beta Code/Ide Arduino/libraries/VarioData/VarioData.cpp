@@ -577,66 +577,7 @@ void VarioData::update(void)
     updateBeeper();
 #endif //HAVE_SPEAKER
   }
-  else
-  {
-
-    /**************************************************************/
-    /*   ERREUR BAROMETRE / MPU                                   */
-    /**************************************************************/
-
-    if (millis() - compteurErrorMPU > 2000)
-    {
-      SerialPort.println("ERREUR ERREUR BARO / ACCELEROMETRE");
-
-      //**********************************************************
-      //  DISABLE BEEPER
-      //**********************************************************
-
-#ifdef HAVE_SPEAKER
-      beeper.setVelocity(0);
-#endif //HAVE_SPEAKER
-
-      alti = 0;
-      temperature = 0;
-      accel = 0;
-      velocity = 0;
-      calibratedAlti = 0;
-      haveNewClimbRateData = false;
-      climbRate = 0;
-      trend = 0;
-      stateTrend = 0;
-
-      if (displayLowUpdateState)
-      {
-#ifdef AGL_MANAGER_H
-        aglManager.setAlti(0);
-#endif
-
-        double tmpAlti, tmpTemp, tmpAccel;
-
-        MESSLOG(LOG_TYPE_DEBUG, MS5611_DEBUG_LOG, "ERREUR MPU");
-        if (twScheduler.havePressure())
-        {
-          twScheduler.getTempAlti(tmpTemp, tmpAlti);
-          DUMPLOG(LOG_TYPE_DEBUG, MS5611_DEBUG_LOG, tmpAlti);
-        }
-        else
-        {
-          MESSLOG(LOG_TYPE_DEBUG, MS5611_DEBUG_LOG, "AUCUNE MESURE MS5611");
-        }
-
-        if (twScheduler.haveAccel())
-        {
-          tmpAccel = twScheduler.getAccel(NULL);
-          DUMPLOG(LOG_TYPE_DEBUG, MS5611_DEBUG_LOG, tmpAccel);
-        }
-        else
-        {
-          MESSLOG(LOG_TYPE_DEBUG, MS5611_DEBUG_LOG, "AUCUNE MESURE MPU");
-        }
-      }
-    }
-  }
+  
 }
 
 //*******************************************
@@ -1315,92 +1256,9 @@ int VarioData::getCap(void)
 */
 
   // vitesse > 5km et dernière mesure de vitesse de moins de 1.5s
-  if ((variometerState > VARIOMETER_STATE_CALIBRATED) && (speedAvailable || ((millis() - timeSpeedMesure) < nbMsLastMesureAcceptable)) && (currentSpeed > 5))
-  {
-    if (nmeaParser.haveBearing())
-    {
+ 
 
-      bearing = nmeaParser.getBearing();
-
-      gpsAvailable = true;
-      timeCapMesure = millis();
-
-#ifdef DATA_DEBUG
-      SerialPort.print("Compas GPS : ");
-      SerialPort.println(bearing);
-#endif //DATA_DEBUG
-    }
-  }
-
-  // desactive le baro GPS si pas de mesure durant 1,5sec - passe au baro magnetique
-  if ((gpsAvailable) && ((millis() - timeCapMesure) < nbMsLastMesureAcceptable))
-  {
-    return bearing;
-  }
-  else
-  {
-    gpsAvailable = false;
-  }
-
-  if (twScheduler.haveAccel())
-  {
-    double vertVector[3];
-    twScheduler.getAccel(vertVector);
-
-    // accelerometer and magnetometer data
-    float a, ax, ay, az;
-
-    ax = vertVector[0];
-    ay = vertVector[1];
-    az = vertVector[2];
-
-    // Normalize accelerometer and magnetometer data
-    a = sqrtf(ax * ax + ay * ay + az * az);
-    ax /= a;
-    ay /= a;
-    az /= a;
-    twScheduler.resetNewAccel();
-#ifdef BEARING_DEBUG
-    SerialPort.print("ax : ");
-    SerialPort.println(ax);
-    SerialPort.print("ay : ");
-    SerialPort.println(ay);
-    SerialPort.print("az : ");
-    SerialPort.println(az);
-#endif //DATA_DEBUG
-
-    if (twScheduler.haveMag())
-    {
-      double northVector[2];
-      double northVectorNorm[2];
-      twScheduler.getNorthVector(vertVector, northVector);
-
-      double norm = sqrt(northVector[0] * northVector[0] + northVector[1] * northVector[1]);
-      northVectorNorm[0] = northVector[0] / norm;
-      northVectorNorm[1] = northVector[1] / norm;
-
-      int tmpcap = atan2(northVectorNorm[1], northVectorNorm[0]) * 180 / M_PI;
-      if (tmpcap < 0)
-      {
-        tmpcap = tmpcap + 360;
-      }
-      bearing = tmpcap;
-    }
-    else
-    {
-      bearing = -1;
-      nbMesureCap = 0;
-      // return 0;
-    }
-  }
-  else
-  {
-    bearing = -1;
-    nbMesureCap = 0;
-    // return 0;
-  }
-
-  return bearing;
+  return 0;
 }
 
 // Bound angle between 0 and 360

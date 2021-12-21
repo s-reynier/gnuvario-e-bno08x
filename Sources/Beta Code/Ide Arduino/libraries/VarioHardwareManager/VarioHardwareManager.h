@@ -57,14 +57,16 @@
 class VarioHardwareManager
 {
 private:
-	VarioImu varioImu;
-	VarioGps varioGps;
+	
+	
 #ifdef HAVE_BLUETOOTH
 	VarioBluetooth varioBT;
 #endif
 
 
 public:
+	VarioGps varioGps;
+	VarioImu varioImu;
 	VarioPower varioPower;
 	VarioSpeaker varioSpeaker;
 

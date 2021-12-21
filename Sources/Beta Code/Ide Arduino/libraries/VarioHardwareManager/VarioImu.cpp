@@ -40,11 +40,7 @@
 
 VarioImu::VarioImu()
 {
-#ifdef TWOWIRESCHEDULER
   imu = new VarioImuTwoWire;
-#else
-  imu = new VarioImuStd;
-#endif
 }
 
 //*******************************

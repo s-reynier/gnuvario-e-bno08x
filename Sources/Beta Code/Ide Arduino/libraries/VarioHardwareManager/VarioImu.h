@@ -36,20 +36,13 @@
 #include <HardwareConfig.h>
 #include <kalmanvert.h>
 
-#ifdef TWOWIRESCHEDULER
 #include <VarioImuTwoWire.h>
-#else
-#include <VarioImuStd.h>
-#endif
 
 class VarioImu
 {
 private:
-#ifdef TWOWIRESCHEDULER
+
     VarioImuTwoWire *imu;
-#else
-    VarioImuStd *imu;
-#endif
     Kalmanvert kalmanVert;
 
 public:

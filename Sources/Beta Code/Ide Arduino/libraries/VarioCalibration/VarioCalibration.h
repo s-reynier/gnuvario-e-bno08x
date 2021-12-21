@@ -38,22 +38,6 @@
 #include <HardwareConfig.h>
 #include <DebugConfig.h>
 
-#define TWOWIRESCHEDULER
-
-#ifdef TWOWIRESCHEDULER
-#include <IntTW.h>
-#include <ms5611TW.h>
-#include <vertaccel.h>
-#include <LightInvensense.h>
-#include <TwoWireScheduler.h>
-#else
-#include <MS5611-Ext.h>
-#include <Wire.h>
-#include <vertaccel2.h>
-//#include <SparkFunMPU9250-DMP.h>
-#include <MPU9250-DMP_SF_EXT.h>
-#endif
-
 #include <digit.h>
 
 #ifdef HAVE_SDCARD
@@ -61,21 +45,6 @@
 #endif	//HAVE_SDCARD
 
 #include <VarioSettings.h>
-
-/* where output ? */
-#define SERIAL_OUTPUT
-#define SDCARD_OUTPUT
-
-#define RECORD_STATE_INITIAL 0
-#define RECORD_STATE_WAIT_DONE 1
-#define RECORD_STATE_ACCEL_SD_RECORDED 2
-#define RECORD_STATE_GYRO_CALIBRATED 3
-
-/*
-extern MS5611 ms5611;
-extern MPU9250_DMP imu;
-extern Vertaccel vertaccel;
-*/
 
 
 class VarioCalibration {
@@ -92,7 +61,7 @@ private:
 	unsigned long accelSDRecordTimestamp;
 	double rawAccelSD;
 
-	int recordInitState = RECORD_STATE_INITIAL;
+	int recordInitState = 0;
 
 	double referencePressure;
 
@@ -107,13 +76,6 @@ private:
 	double accelMean[3];
 	double accelSD[3];
 
-#ifdef AK89xx_SECONDARY
-/* mag measures */
-	int16_t lastMagMeasure[3];
-	long magCount;
-	double magMean[3];
-	double magSD[3];
-#endif //AK89xx_SECONDARY
 
 #if defined(SDCARD_OUTPUT) && defined(HAVE_SDCARD)
 #ifdef SDFAT_LIB

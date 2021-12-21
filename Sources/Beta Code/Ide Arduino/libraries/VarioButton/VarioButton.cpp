@@ -73,7 +73,6 @@
 
 #include <Utility.h>
 #include <VarioCalibration.h>
-
 #ifdef BUTTON_DEBUG
 #define ARDUINOTRACE_ENABLE 1
 #else

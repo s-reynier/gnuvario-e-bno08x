@@ -222,8 +222,6 @@ void deep_sleep(String Message) {
 	toneHAL.disableAmpli();
 	#endif
 	//	rtc_gpio_isolate(GPIO_NUM_12);
-
-	twScheduler.disableAcquisition();
 	
 	rtc_gpio_isolate(GPIO_BUTTON_A);
 	rtc_gpio_isolate(GPIO_BUTTON_C);

@@ -254,7 +254,7 @@
 *               23/05/20             Correction bug d'affichage (valeur > affichage)                  *
 *                                    correction bug affichage alternatif finesse / taux de chute      *
 *                                    Alternance compas GPS / compas magnétique                        *
-* 																	 AJOUT - Réglage sensibilité filtre kalman et vario               *                                         
+*                                    AJOUT - Réglage sensibilité filtre kalman et vario               *                                         
 *                                      pas concluant                                                  *
 * 0.8 Beta 3    26/05/20             Correction gestion d'erreur MPU                                  *
 *                                    Amélioration du son - test cosine                                *

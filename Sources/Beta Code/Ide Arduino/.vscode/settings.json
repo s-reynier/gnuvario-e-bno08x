@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "varioimutwowire.h": "c",
+        "ms5611.h": "c",
+        "debugconfig.h": "c",
+        "hardwareconfig.h": "c",
+        "variodata.h": "c",
+        "variosettings.h": "c"
+    }
+}

@@ -1,45 +1,3 @@
-/* VarioData -- 
- *
- * Copyright 2020 MichelPa / Jpg63
- * 
- * This file is part of GnuVario-E.
- *
- * ToneHAL is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ToneHAL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-/* 
- *********************************************************************************
- *                                                                               *
- *                           VarioData                                           *
- *                                                                               *
- *  version    Date     Description                                              *
- *    1.0    22/03/20                                                            *
- *    1.0.1  25/03/20   Ajout dataAcquisition(void)                              *
- *        							compteurErrorMPU																				 *
- *    1.0.2  07/04/20   ajout updateBeeper(void)                                 *
- *    1.0.3  18/04/20   Ajour reglage du kalman                                  *
- *                      Ajout intégration vario                                  *
- *    1.0.4  08/05/20   Ajout getCap                                             *
- *    1.0.5  27/06/20   Ajout varioxbeeper                                       *
- *    1.0.6  30/07/20   Ajout gestion valeur maximum des données                 *
- *    1.0.7  27/09/20   Ajout test sur lecture des fichiers de config            *
- *    1.0.8  18/10/20   Ajout STATE_PAGE_CHARGE                                  *
- *    1.0.9  25/12/20   Modif getCap                                             *
- *                                                                               *
- *********************************************************************************
- */
-
 #ifndef VARIO_DATA_H
 #define VARIO_DATA_H
 
@@ -48,16 +6,8 @@
 #include "VarioDataProcessing.h"
 
 #include <kalmanvert.h>
-//#include "VarioDataTwoWireScheduler.h"
-#include <IntTW.h>
-#include <ms5611TW.h>
-#include <vertaccel.h>
-//#ifdef TWOWIRESCHEDULER
-#include <LightInvensense.h>
-//#endif
-#include <TwoWireScheduler.h>
+#include <VarioSettings.h>
 #include <sdcardHAL.h>
-//#include <GPSSentence.h>
 
 /*********************/
 /*  AGL              */

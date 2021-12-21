@@ -38,11 +38,8 @@
 
 #ifdef TWOWIRESCHEDULER
 
-#include <IntTW.h>
-#include <ms5611TW.h>
-#include <vertaccel.h>
-#include <LightInvensense.h>
-#include <TwoWireScheduler.h>
+#include <MS5611.h>
+#include <I2CWrapper.h>
 
 class VarioImuTwoWire
 {

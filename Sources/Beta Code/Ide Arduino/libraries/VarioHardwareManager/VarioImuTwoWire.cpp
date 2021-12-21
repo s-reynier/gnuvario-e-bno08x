@@ -1,57 +1,16 @@
-/* VarioImuTwoWire -- 
- *
- * Copyright 2020 MichelPa / Jpg63
- * 
- * This file is part of GnuVario-E.
- *
- * ToneHAL is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ToneHAL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-/* 
- *********************************************************************************
- *                                                                               *
- *                          VarioImuTwoWire                                      *
- *                                                                               *
- *  version    Date     Description                                              *
- *    1.0    22/03/20                                                            *
- *    1.0.1  25/03/20   Ajout haveMeasure(void)																	 *
- *    1.0.2  25/12/20   Modif getCap                                             *
- *    1.0.3  11/04/21   Mofig getAlti                                            *
- *                                                                               *
- *********************************************************************************
- */
- 
 #include <Arduino.h> 
 #include <HardwareConfig.h>
 #include <DebugConfig.h>
 #include <VarioLog.h>
 
-#include "VarioImuTwoWire.h"
+#include "I2CWrapper.h"
 #include "VarioData.h"
+#include <MS5611.h>
+#include <SparkFun_BNO080_Arduino_Library.h>
+#include "VarioImuTwoWire.h"
 
-#ifdef TWOWIRESCHEDULER
-
-
-#ifdef HAVE_BMP280
-Bmp280 TWScheduler::bmp280;
-#else
-Ms5611 TWScheduler::ms5611;
-#endif
-
-#ifdef HAVE_ACCELEROMETER
-Vertaccel TWScheduler::vertaccel;
-#endif //HAVE_ACCELEROMETER
+MS5611 ms5611;
+BNO080 myIMU;
 
 #include <math.h>
 
@@ -67,23 +26,44 @@ VarioImuTwoWire::VarioImuTwoWire()
 void VarioImuTwoWire::init()
 //**********************************
 {
-    /**************************/
-    /* init Two Wires devices */
-    /**************************/
-    //!!!
-#ifdef HAVE_ACCELEROMETER
-    intTW.begin();
-    twScheduler.init();
-    //  vertaccel.init();
+  // Init BUS I2C  
+  I2CWrapper::init();
 
-#endif //HAVE_ACCELEROMETER
+// Init Moniteur serie  
+  while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
+  Serial.println(F("ALL CAPTEUR"));
+
+// Init MS5611
+  // Initialize MS5611 sensor
+  // Ultra high resolution: MS5611_ULTRA_HIGH_RES
+  // (default) High resolution: MS5611_HIGH_RES
+  // Standard: MS5611_STANDARD
+  // Low power: MS5611_LOW_POWER
+  // Ultra low power: MS5611_ULTRA_LOW_POWER
+  while(!ms5611.begin(MS5611_ULTRA_HIGH_RES))
+  {
+    delay(500);
+  }
+
+// Init BNO080 sparkfun
+  if (myIMU.begin(0x4A, Wire) == false)
+  {
+    Serial.println("BNO080 not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
+    while (1);
+  }
+
+  Wire.setClock(400000); //Increase I2C data rate to 400kHz
+
+  myIMU.enableRotationVector(50); //Send data update every 50ms
+  myIMU.enableAccelerometer(50);
+  myIMU.enableMagnetometer(50);
 }
 
 //**********************************
 bool VarioImuTwoWire::havePressure(void)
 //**********************************
 {
-	return(twScheduler.havePressure());
+	return true;
 }
 
 
@@ -91,14 +71,11 @@ bool VarioImuTwoWire::havePressure(void)
 bool VarioImuTwoWire::updateData(void)
 //**********************************
 {
-#ifdef HAVE_ACCELEROMETER
-  if (twScheduler.havePressure() && twScheduler.haveAccel())
-  {
-		CompteurAccel = 0;
-		twScheduler.resetNewAccel();
-    twScheduler.getTempAlti(Temp, Alti);
+
+	CompteurAccel = 0;
+	Temp = ms5611.readTemperature();
     Temp += GnuSettings.COMPENSATION_TEMP; //MPU_COMP_TEMP;
-    Accel = twScheduler.getAccel(NULL);
+    Accel = myIMU.getAccelY();
 		
 #ifdef DATA_DEBUG
     SerialPort.print("VarioImuTwoWire Update");
@@ -110,67 +87,21 @@ bool VarioImuTwoWire::updateData(void)
     SerialPort.println(Accel);
 #endif //DATA_DEBUG
 				
-		return true;
-	} 
-	else if (twScheduler.haveNewAccel())
-	{
+
 		CompteurAccel++;
-		twScheduler.resetNewAccel();
 		if (CompteurAccel > 100) {
-			CompteurAccel = 0;
-			twScheduler.resetNewAccel();
-			MESSLOG(LOG_TYPE_DEBUG,MS5611_DEBUG_LOG,"ERREUR MPU");
-			MESSLOG(LOG_TYPE_DEBUG,MS5611_DEBUG_LOG,"AUCUNE MESURE MS5611");       
+			CompteurAccel = 0;    
 		}
-	}
-#else //HAVE_ACCELEROMETER
 	
-  if (twScheduler.havePressure())
-  {
-
-#ifdef MS5611_DEBUG
-//    SerialPort.println("havePressure");
-#endif //MS5611_DEBUG
-
-    twScheduler.getTempAlti(Temp, Alti);
-    Temp += GnuSettings.COMPENSATION_TEMP; //MPU_COMP_TEMP;
-		Accel = 0;
-		
-#ifdef DATA_DEBUG
-    SerialPort.print("Alti : ");
-    SerialPort.println(Alti);
-    SerialPort.print("Temperature : ");
-    SerialPort.println(Temp);
-    SerialPort.print("Accel : ");
-    SerialPort.println(Accel);
-#endif //DATA_DEBUG
-		
-		return true;
-	}
-#endif
-
-/*  Temp = 0;
-	Alti = 0;
-	Accel =0;
-	
-#ifdef DATA_DEBUG
-	SerialPort.println("ERREUR ACQUISITION MS5611/MPU");
-	SerialPort.print("Alti : ");
-	SerialPort.println(Alti);
-	SerialPort.print("Temperature : ");
-	SerialPort.println(Temp);
-	SerialPort.print("Accel : ");
-	SerialPort.println(Accel);
-#endif //DATA_DEBUG*/
-	
-	return false;
+	return true;
 }
 
 //**********************************
 void VarioImuTwoWire::updateAlti()
 //**********************************
 {
-  Alti = twScheduler.getAlti();
+  long realPressure = ms5611.readPressure();
+  Alti = ms5611.getAltitude(realPressure);
 }
 
 //**********************************
@@ -193,5 +124,3 @@ double VarioImuTwoWire::getAccel()
 {
   return Accel; //twScheduler.getAlti();
 }
-
-#endif // TWOWIRESCHEDULER
