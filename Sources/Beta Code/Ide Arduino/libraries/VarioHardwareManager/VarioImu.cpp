@@ -131,3 +131,7 @@ double VarioImu::getAccel()
   //*******************************
   return this->imu->getAccel();
 }
+
+int VarioImu::getBearing() {
+  return this->imu->getBearing();
+}

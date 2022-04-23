@@ -271,3 +271,7 @@ bool VarioHardwareManager::updateGps(Kalmanvert kalmanvert)
   return false;
 #endif //HAVE_GPS
 }
+
+int VarioHardwareManager::getBearing() {
+  return varioImu.getBearing();
+}

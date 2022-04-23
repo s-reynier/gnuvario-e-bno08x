@@ -16,9 +16,9 @@ I2CWrapper i2CWrapper;
 
 void I2CWrapper::init(void) {
 
-    delay(100);
+
     Wire.flush();
     Wire.begin (VARIO_TW_SDA_PIN, VARIO_TW_SCL_PIN);
-    delay (250);
+
     Wire.setClock(400000); //Increase I2C data rate to 400kHz
 }

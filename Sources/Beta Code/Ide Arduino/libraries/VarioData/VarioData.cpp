@@ -447,6 +447,7 @@ void VarioData::update(void)
     temperature = varioHardwareManager.getTemp();
     accel = varioHardwareManager.getAccel();
 
+
 #ifdef DATA_DEBUG
     SerialPort.println("Kalman Update");
 #endif //PROG_DEBUG
@@ -1256,9 +1257,7 @@ int VarioData::getCap(void)
 */
 
   // vitesse > 5km et dernière mesure de vitesse de moins de 1.5s
- 
-
-  return 0;
+  return varioHardwareManager.getBearing();
 }
 
 // Bound angle between 0 and 360

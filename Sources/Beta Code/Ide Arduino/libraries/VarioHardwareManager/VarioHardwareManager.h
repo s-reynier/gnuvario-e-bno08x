@@ -86,7 +86,7 @@ public:
 	double getAlti();
 	double getTemp();
 	double getAccel();
-
+	int getBearing();
 	void testInactivity(double velocity);
 
 	bool updateBluetooth(double velocity, double alti, double altiCalibrated);

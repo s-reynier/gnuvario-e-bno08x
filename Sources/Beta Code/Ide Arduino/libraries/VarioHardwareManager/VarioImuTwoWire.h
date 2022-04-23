@@ -53,12 +53,15 @@ public:
   double getAlti();
   double getTemp();
   double getAccel();
+  int getBearing();
 
 private:
   double Alti;
   double Temp;
-  double Accel;
+  float Accel;
 	int	   CompteurAccel = 0;
+  float magx;
+  float magy;
 };
 
 #endif //TWOWIRESCHEDULER

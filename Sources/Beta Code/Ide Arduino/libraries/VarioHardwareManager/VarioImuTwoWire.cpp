@@ -49,13 +49,16 @@ void VarioImuTwoWire::init()
   if (myIMU.begin(0x4A, Wire) == false)
   {
     Serial.println("BNO080 not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
+
     while (1);
   }
+
+  Serial.println("BNO080 Initialized");
 
   Wire.setClock(400000); //Increase I2C data rate to 400kHz
 
   myIMU.enableRotationVector(50); //Send data update every 50ms
-  myIMU.enableAccelerometer(50);
+  myIMU.enableLinearAccelerometer(50);
   myIMU.enableMagnetometer(50);
 }
 
@@ -74,8 +77,24 @@ bool VarioImuTwoWire::updateData(void)
 
 	CompteurAccel = 0;
 	Temp = ms5611.readTemperature();
-    Temp += GnuSettings.COMPENSATION_TEMP; //MPU_COMP_TEMP;
-    Accel = myIMU.getAccelY();
+  Temp += GnuSettings.COMPENSATION_TEMP; //MPU_COMP_TEMP;
+
+  if (myIMU.dataAvailable() == true)
+  {
+    Accel = myIMU.getLinAccelZ();
+    
+    magx = myIMU.getMagX();
+    magy = myIMU.getMagY();
+
+    CompteurAccel++;
+		if (CompteurAccel > 100) {
+			CompteurAccel = 0;    
+		}
+
+  }else{
+    SerialPort.print("IMU data not dataAvailable");
+    Accel = 0.0;
+  }
 		
 #ifdef DATA_DEBUG
     SerialPort.print("VarioImuTwoWire Update");
@@ -86,12 +105,6 @@ bool VarioImuTwoWire::updateData(void)
     SerialPort.print("Accel : ");
     SerialPort.println(Accel);
 #endif //DATA_DEBUG
-				
-
-		CompteurAccel++;
-		if (CompteurAccel > 100) {
-			CompteurAccel = 0;    
-		}
 	
 	return true;
 }
@@ -123,4 +136,27 @@ double VarioImuTwoWire::getAccel()
 //**********************************
 {
   return Accel; //twScheduler.getAlti();
+}
+
+
+int VarioImuTwoWire::getBearing() {
+
+
+  if(magy>0) {
+    return 90-atan(magx/magy)*180 / 3.14;
+  } 
+  else if(magy<0) 
+  {
+    return 270 - (atan(magx/magy)) * 180/ 3.14;
+  } 
+  else if((magy = 0 && magx < 0))
+  {
+    return 180;
+  }
+  else if((magy=0 && magx > 0))
+  {
+    return 0.0;
+  }
+
+  return 0;
 }

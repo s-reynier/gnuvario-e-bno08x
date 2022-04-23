@@ -53,6 +53,7 @@ public:
     double getAlti();
     double getTemp();
     double getAccel();
+    int getBearing();
 };
 
 #endif //VARIO_IMU_H
